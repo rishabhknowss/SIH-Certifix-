@@ -1,4 +1,4 @@
-"use client";
+"use client" ;
 import React, { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { certificateDetailStore } from "@/hooks/certificate-detail-store";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 
 const formSchema = z.object({
@@ -50,17 +50,106 @@ export function GenerateForm() {
     mode: "onChange",
   });
 
-  const [randomHash, setRandomHash] = useState(""); // State to store the random hash
-  const [contractInstance, setContractInstance] = useState(null); // State to store the contract instance
+  const [randomHash, setRandomHash] = useState("");
+  const [contractInstance, setContractInstance] = useState(null);
 
-  // Initialize Web3 with your Ethereum provider (e.g., MetaMask)
   const web3 = new Web3(window.ethereum);
 
   useEffect(() => {
-    // Initialize the contract instance with the deployed contract address
-    const contractAddress = 'YOUR_CONTRACT_ADDRESS'; // Replace with your deployed contract address
-    const contractABI = [ // Replace with your contract's ABI
-      // ABI definition for your contract functions
+    const contractAddress = '0x36329B602119e7Ba1C3703227910d3bADB9bEb29';
+    const contractABI =   [
+      {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "previousOwner",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+          }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "uint256",
+            "name": "hashValue",
+            "type": "uint256"
+          }
+        ],
+        "name": "RandomHashGenerated",
+        "type": "event"
+      },
+      {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+      },
+      {
+        "inputs": [],
+        "name": "randomHash",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+      },
+      {
+        "inputs": [],
+        "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+          }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "generateRandomHash",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
     ];
 
     const contract = new web3.eth.Contract(contractABI, contractAddress);
@@ -69,7 +158,6 @@ export function GenerateForm() {
 
   useEffect(() => {
     if (contractInstance) {
-      // Fetch the random hash from the smart contract
       contractInstance.methods.randomHash().call()
         .then((hash) => {
           setRandomHash(hash);
@@ -82,27 +170,22 @@ export function GenerateForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      // Ensure that the wallet is connected
       if (!window.ethereum.selectedAddress) {
-        // If the wallet is not connected, you can show an error message to the user.
         console.error('Wallet is not connected.');
         return;
       }
 
-      // Create a transaction object
       const transaction = {
-        to: 'YOUR_SMART_CONTRACT_ADDRESS', // Replace with the recipient address
-        value: web3.utils.toWei('0.1', 'ether'), // Replace with the desired amount in ether
-        data: '0x', // Replace with the contract function call data if applicable
+        to: '0x36329B602119e7Ba1C3703227910d3bADB9bEb29',
+        value: web3.utils.toWei('0.1', 'ether'),
+        data: '0x',
       };
 
-      // Send the transaction
       const accounts = await web3.eth.getAccounts();
       const result = await web3.eth.sendTransaction({ ...transaction, from: accounts[0] });
 
       console.log('Transaction result:', result);
 
-      // Update your app's state or perform any additional actions
       updateDetails({
         name: values.name,
         phone: values.phone,
@@ -205,7 +288,6 @@ export function GenerateForm() {
 
         <Button type="submit">Generate</Button>
 
-        {/* Display the random hash from the smart contract */}
         {randomHash && (
           <div>
             <p>Random Hash: {randomHash}</p>

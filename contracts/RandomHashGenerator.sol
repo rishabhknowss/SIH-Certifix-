@@ -13,7 +13,7 @@ contract RandomHashGenerator is Ownable {
     }
 
     function generateRandomHash() public onlyOwner {
-        randomHash = uint256(keccak256(abi.encodePacked(block.prevrandao, block.timestamp, block.number)));
+        uint256 newRandomHash = uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty , block.number )));
         emit RandomHashGenerated(randomHash);
     }
 }
